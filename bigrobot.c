@@ -14,6 +14,8 @@ const int CLAW_DELAY = 100;
 
 // DRIVING CONSTANTS
 const int INCHES_CONSTANT = 0.9;
+const int TAPE_THRESHOLD = 1800;
+const int TAPE_SPEED = 250 ;
 
 // ARM CONSTANTS
 const int TOWER_RIGHT_MAX = 1800; // putting rings in towers
@@ -23,9 +25,12 @@ const int RIGHT_ARM_MIN = 1800;
 
 int main()
 {
+    enable_servos();
     create_connect();
 
     create_disconnect();
+    disable_servos();
+    ao();
     return 0;
 }
 
@@ -67,6 +72,27 @@ void forward(int i)
         create_drive_direct(100, 100);
     }
     create_stop();
+}
+
+void forwardTillTape() {
+    while ( (get_create_lfcliff_amt() < TAPE_THRESHOLD) || (get_create_rfcliff_amt() < TAPE_THRESHOLD) ){
+        if ( (get_create_lfcliff_amt() < TAPE_THRESHOLD) && (get_create_rfcliff_amt() >= TAPE_THRESHOLD) ) {
+            create_drive_direct(0.75*TAPE_SPEED, -0.1*TAPE_SPEED);
+        }
+        else if ( (get_create_lfcliff_amt() >= TAPE_THRESHOLD) && (get_create_rfcliff_amt() < TAPE_THRESHOLD) ) {
+            create_drive_direct(-0.1*TAPE_SPEED, 0.75*TAPE_SPEED);
+        }
+        else {
+            create_drive_direct(TAPE_SPEED,TAPE_SPEED);
+        }
+    }
+    create_stop();
+}
+
+void forwardTillBump() {
+    while ((get_create_distance() < 1000) && (get_create_rbump() == 0)) {
+        create_drive_direct(200, 200);
+    } 
 }
 
 void turnLeft(int degrees)
