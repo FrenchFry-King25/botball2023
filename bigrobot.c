@@ -1,5 +1,4 @@
 #include <kipr/botball.h>
-#include "Claw.h"
 
 // SERVO PINS
 const int TOWER_RIGHT = 0;  //
@@ -9,7 +8,7 @@ const int CLAW = 4;         // powering the claw to open and close
 
 // CLAW CONSTANTS
 const int CLAW_OPEN_POSITION = 0;
-const int CLAW_CLOSED_POSITION = 0;
+const int CLAW_CLOSE_POSITION = 0;
 const int CLAW_DELAY = 100;
 
 // DRIVING CONSTANTS
@@ -27,10 +26,14 @@ int main()
 {
     enable_servos();
     create_connect();
+    
+    robotForward(10000);
 
     create_disconnect();
     disable_servos();
     ao();
+    
+    
     return 0;
 }
 
@@ -55,13 +58,12 @@ void putRingIndex(int ringIndex)
     */
 }
 
-void putRing()
-{
-}
 
-void forward(int i)
+
+void robotForward(int i)
 {
     set_create_distance(0);
+    printf(i * INCHES_CONSTANT);
     while (get_create_distance() < (i * INCHES_CONSTANT))
     {
         create_drive_direct(100, 100);
@@ -89,13 +91,15 @@ void FromNthTowerToMthTower(int n, int m){
     // assumes the robot is not already on a tape
     // m > n
     
-    for(int i = n; i <= m; i++){
-        while( (get_create_lfcliff_amt < TAPE_THRESHOLD) ){
-            create_drive_direct(TAPE_SPEED, TAPE_SPEED);
-        }
+   int i = n;
+   while (i <= m){
+   	  while( (get_create_lfcliff_amt() < TAPE_THRESHOLD) ){
+          create_drive_direct(TAPE_SPEED, TAPE_SPEED);
+      }
 
-        create_stop();
-    }
+      create_stop();
+      i++;
+   }
 }
 
 void forwardTillBump() {
@@ -138,17 +142,17 @@ void openClaw()
 
 void closeClaw()
 {
-    set_servo_position(CLAW, CLAW_CLOSE_POSOTION);
-    msleep(CLAW_DELAY)
+    set_servo_position(CLAW, CLAW_CLOSE_POSITION);
+    msleep(CLAW_DELAY);
 }
 
 
 void boxUnderPomPom(){
     //
-    forward(5); //or some integer
-    turnRight();
+    robotForward(5); //or some integer
+    turnRight(90);
 
-    forward(5);
+    robotForward(5);
     
     turnLeft(90);
 
