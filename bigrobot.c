@@ -15,7 +15,7 @@ const int CLAW_DELAY = 100;
 // DRIVING CONSTANTS
 const int INCHES_CONSTANT = 0.9;
 const int TAPE_THRESHOLD = 1800;
-const int TAPE_SPEED = 250 ;
+const int TAPE_SPEED = 250 ; // mm per second, should be low
 
 // ARM CONSTANTS
 const int TOWER_RIGHT_MAX = 1800; // putting rings in towers
@@ -53,11 +53,6 @@ void putRingIndex(int ringIndex)
     3 - green ring
     4 - blue ring
     */
-
-    switch (ringIndex)
-    {
-    case 0:
-    }
 }
 
 void putRing()
@@ -74,7 +69,8 @@ void forward(int i)
     create_stop();
 }
 
-void forwardTillTape() {
+void forwardTillTape() { 
+
     while ( (get_create_lfcliff_amt() < TAPE_THRESHOLD) || (get_create_rfcliff_amt() < TAPE_THRESHOLD) ){
         if ( (get_create_lfcliff_amt() < TAPE_THRESHOLD) && (get_create_rfcliff_amt() >= TAPE_THRESHOLD) ) {
             create_drive_direct(0.75*TAPE_SPEED, -0.1*TAPE_SPEED);
@@ -87,6 +83,19 @@ void forwardTillTape() {
         }
     }
     create_stop();
+}
+
+void FromNthTowerToMthTower(int n, int m){ 
+    // assumes the robot is not already on a tape
+    // m > n
+    
+    for(int i = n; i <= m; i++){
+        while( (get_create_lfcliff_amt < TAPE_THRESHOLD) ){
+            create_drive_direct(TAPE_SPEED, TAPE_SPEED);
+        }
+
+        create_stop();
+    }
 }
 
 void forwardTillBump() {
@@ -112,7 +121,13 @@ void turnRight(int degrees)
     {
         create_drive_direct(100, -100);
     }
-    create_stop();
+
+     create_stop();
+}
+
+void turnAround(){
+    turnRight(90);
+    turnRight(90);
 }
 
 void openClaw()
@@ -125,4 +140,29 @@ void closeClaw()
 {
     set_servo_position(CLAW, CLAW_CLOSE_POSOTION);
     msleep(CLAW_DELAY)
+}
+
+
+void boxUnderPomPom(){
+    //
+    forward(5); //or some integer
+    turnRight();
+
+    forward(5);
+    
+    turnLeft(90);
+
+    forwardTillBump();
+
+    turnLeft(90);
+
+    forwardTillBump();
+
+    turnAround();
+}
+
+void yeetBotGirl(){
+    FromNthTowerToMthTower(1, 3);
+     
+    //arm motion
 }
