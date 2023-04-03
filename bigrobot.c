@@ -12,7 +12,7 @@ const int CLAW_CLOSE_POSITION = 0;
 const int CLAW_DELAY = 100;
 
 // DRIVING CONSTANTS
-const int INCHES_CONSTANT = 0.9;
+const double INCHES_CONSTANT = 1.00;
 const int TAPE_THRESHOLD = 1800;
 const int TAPE_SPEED = 250 ; // mm per second, should be low
 
@@ -27,7 +27,7 @@ int main()
     enable_servos();
     create_connect();
     
-    robotForward(10000);
+    robotForward(500);
 
     create_disconnect();
     disable_servos();
@@ -63,11 +63,16 @@ void putRingIndex(int ringIndex)
 void robotForward(int i)
 {
     set_create_distance(0);
-    printf(i * INCHES_CONSTANT);
+    
+    printf("%lf", (i * INCHES_CONSTANT));
+    
     while (get_create_distance() < (i * INCHES_CONSTANT))
     {
         create_drive_direct(100, 100);
+        printf("%i", get_create_distance());
     }
+    
+    printf("%i", get_create_distance());
     create_stop();
 }
 
@@ -121,7 +126,7 @@ void turnLeft(int degrees)
 void turnRight(int degrees)
 {
     set_create_total_angle(0);
-    while (get_create_total_angle() > (degrees * -1))
+    while (get_create_total_angle() > (degrees))
     {
         create_drive_direct(100, -100);
     }
