@@ -175,3 +175,15 @@ void yeetBotGirl(){
      
     //arm motion
 }
+
+void liftArm() {
+    set_servo_position(TOWER_RIGHT, 0);
+    set_servo_position(TOWER_LEFT, 100);
+    msleep(1000);
+}
+
+void lowerArm(){
+    set_servo_position(TOWER_RIGHT, 100);
+    set_servo_position(TOWER_LEFT, 0);
+    msleep(1000);
+}
