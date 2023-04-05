@@ -110,6 +110,13 @@ void forwardTilGrayTape() {
     create_stop();
 }
 
-void releaseNoodle(){
+void releaseGreenNoodle(){
 
 }
+
+void grabGreenNoodle(){
+
+
+}
+
+ovoi
