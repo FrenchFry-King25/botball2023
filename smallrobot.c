@@ -7,7 +7,7 @@ const int suckerWheels = 3;
 const int magSpin = 2;
 
 //SERVOS
-const int claw = 2; // 2047 open ; 500 closed
+const int claw = 2; // 1900 open ; 500 closed
 const int arm = 1; // 315 down; 1280 up
 
 const float TICKS_CONSTSANT = .5;
@@ -68,13 +68,15 @@ void jiggle() {
 void spinServo(int port, int pos) {
     if(get_servo_position(port) > pos) {
     	while(get_servo_position(port) > pos) {
-            set_servo_position(port, (get_servo_position(port) - 50));
-            msleep(1000);
+            msleep(100);
+            set_servo_position(port, (get_servo_position(port) - 10));
+            msleep(100);
         }        
     } else {
         while(get_servo_position(port) < pos) {
-            set_servo_position(port, (get_servo_position(port) + 5));
-            msleep(1000);
+            msleep(100);
+            set_servo_position(port, (get_servo_position(port) + 10));
+            msleep(100);
         }
     }
 }
@@ -194,7 +196,7 @@ void getNoodleFromStand(){
 	enable_servo(arm);
     enable_servo(claw);
     set_servo_position(arm, 315);
-    set_servo_position(claw, 2047);
+    set_servo_position(claw, 1900);
     msleep(200);   
     forwardTillTape();
     off(leftWheel);
@@ -214,7 +216,7 @@ void getNoodleFromStand(){
     msleep(500);    
     set_servo_position(arm, 1500);
     msleep(3000);
-    set_servo_position(claw, 2000);
+    set_servo_position(claw, 1900);
     msleep(500);
     disable_servo(claw);
     msleep(1000); 
