@@ -10,7 +10,7 @@ int main()
     enable_servos();
     create_connect();
 
-    doRingBottom(0);
+    initServos();
 
     create_disconnect();
     disable_servos();
@@ -88,7 +88,7 @@ void forwardTillBump()
     }
 }
 
-/*--------------------------------------------------------Movement--------------------------------------------------------*/
+/*--------------------------------------------------------Rotation--------------------------------------------------------*/
 
 void robotTurn(int angle)
 {
@@ -104,8 +104,8 @@ void turnAround()
 // SERVO PINS
 const int CLAW = 0;         // powering the claw to open and close
 const int CLAW_PARLLEL = 1; // the vertical rotation of the servo for the sake of making the claw move parallel-ly
-const int TOWER_LEFT = 3;   // this servo is used to drop off the rings on the TOWER
-const int TOWER_RIGHT = 4;  // this servo is used to pick up the rings from the FLOOR (tower left and right do different things b/c we want it to go more than 180 degrees)
+const int TOWER_LEFT = 2;   // this servo is used to drop off the rings on the TOWER
+const int TOWER_RIGHT = 3;  // this servo is used to pick up the rings from the FLOOR (tower left and right do different things b/c we want it to go more than 180 degrees)
 
 /* ringIndex :
 0 - RED
@@ -114,6 +114,23 @@ const int TOWER_RIGHT = 4;  // this servo is used to pick up the rings from the 
 3 - GREEN
 4 - BLUE
 */
+
+void initServos()
+{
+    clawOpen();
+    msleep(1000);
+
+    clawParallel(0);
+    msleep(1000);
+
+    disable_servo(TOWER_RIGHT);
+    msleep(100);
+    set_servo_position(TOWER_LEFT, 0);
+    msleep(1000);
+
+    clawPickup(0);
+    msleep(1000);
+}
 
 const int closeClawPositionList[5] = {245, 245, 320, 650, 690};
 void closeClaw(int ringIndex)
@@ -135,19 +152,27 @@ const int clawPickupPositionList[5] = {1260, 1295, 1380, 1410, 1500};
 void clawPickup(int ringIndex)
 {
     // The right servo does this
-    disable_servo(TOWER_LEFT);
+    disable_servo(TOWER_LEFT); // disable to prevent any breaking of servos
+    msleep(100);
+    enable_servo(TOWER_RIGHT); // enable because it might potentionally be disabled
+    msleep(100);
     set_servo_position(TOWER_RIGHT, clawPickupPositionList[ringIndex]);
 }
 
-// void int clawDropOffPositionList[5] = {};
-// void clawDropOff(int ringIndex)
-// {
-//     disable_servo(TOWER_RIGHT);
-//     set_servo_position(TOWER_LEFT, clawDropOffPositionList[ringIndex]);
-// }
+void int clawDropOffPositionList[5] = {0, 0, 0, 0, 0};
+void clawDropOff(int ringIndex)
+{
+    disable_servo(TOWER_RIGHT);
+    msleep(100);
+    enable_servo(TOWER_LEFT);
+    msleep(100);
+    set_servo_position(TOWER_LEFT, clawDropOffPositionList[ringIndex]);
+}
 
 void doRingBottom(int ringIndex) // pick up the rings FROM the (bottom)
 {
+    clawOpen();
+    msleep(1000);
     clawPickup(ringIndex);
     msleep(1000);
     clawParallel(ringIndex);
