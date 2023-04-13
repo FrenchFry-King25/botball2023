@@ -213,6 +213,25 @@ void dispenseNoodlesTesting() {
     msleep(1500);
 }
 
+void ineffectiveNoodleDispensing() { 
+	
+   forwardTillTapeAgainstWall();
+    msleep(1000);
+    backOffTapeAgainstWall();
+    msleep(200);
+    motor(leftWheel, 75);
+    motor(rightWheel, 72);
+    msleep(400);    
+    motor(leftWheel, 0);
+    motor(rightWheel, 0);
+    msleep(1000);
+    motor(suckerWheels, -70)
+   
+    
+  
+    
+}
+
 void getNoodleFromStand(){
 	enable_servo(arm);
     enable_servo(claw);
