@@ -7,7 +7,7 @@ const int suckerWheels = 3;
 const int magSpin = 2;
 
 //SERVOS
-const int claw = 2; // 2047 open ; 500 closed
+const int claw = 2; // 1900 open ; 500 closed
 const int arm = 1; // 315 down; 1280 up
 
 const float TICKS_CONSTSANT = .5;
