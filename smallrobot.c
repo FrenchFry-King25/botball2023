@@ -1,5 +1,5 @@
 #include <kipr/botball.h>
-
+//2.75" from top edge of first tape
 //MOTORS
 const int leftWheel = 1;
 const int rightWheel = 0;
@@ -7,7 +7,7 @@ const int suckerWheels = 3;
 const int magSpin = 2;
 
 //SERVOS
-const int claw = 2; // 1900 open ; 500 closed
+const int claw = 2; // 2047 open ; 500 closed
 const int arm = 1; // 315 down; 1280 up
 
 const float TICKS_CONSTSANT = .5;
@@ -17,6 +17,7 @@ const int leftIR = 0;
 const int rightIR = 1;
 
 // digital buttons 
+const int noodleBump = 2;
 const int leftBump = 1;
 const int rightBump = 0;
 
@@ -26,32 +27,27 @@ const int GRAY_THRESHOLD = 2700;
 const int MOTOR_SPEED = 250;
 
 int main() {
-    //enable_servos();
-    
-    
-    getNoodle();
-    robotForward(1000);
-    getNoodle();
-    
-    
-    
-    
-    //motor(magSpin, -30);
-    //msleep(1000);
-    
-    disable_servo(arm);
-    disable_servo(claw);
-    disable_servos();  	    
-
-    ao();
+    //accepted argument 2550
+    //turnLeft(90);
+    //turnRight(90);
+    //getNoodle();
+    //forwardTillTape();
+    enable_servos();
+    //start_everything();
+    //turnRight(1);
+    startMoving();
+    //forwardTillBump();
+    disable_servos();
     return 0;
+    ao();
+    
 }
 
 void start_everything() {
     set_servo_position(claw, 500);
     set_servo_position(arm, 1280);
-    motor(magSpin, -15);
-    msleep(100);    
+    motor(magSpin, 60);
+    msleep(200);    
     off(magSpin);
     disable_servo(arm);
     disable_servo(claw);
@@ -61,22 +57,20 @@ void jiggle() {
     motor(magSpin, -100);
     msleep(200);
     motor(magSpin, 100);
-    msleep(300);
+    msleep(200);
     motor(magSpin, 0);
 }
 
 void spinServo(int port, int pos) {
     if(get_servo_position(port) > pos) {
     	while(get_servo_position(port) > pos) {
-            msleep(100);
-            set_servo_position(port, (get_servo_position(port) - 10));
-            msleep(100);
+            set_servo_position(port, (get_servo_position(port) - 50));
+            msleep(1000);
         }        
     } else {
         while(get_servo_position(port) < pos) {
-            msleep(100);
-            set_servo_position(port, (get_servo_position(port) + 10));
-            msleep(100);
+            set_servo_position(port, (get_servo_position(port) + 5));
+            msleep(1000);
         }
     }
 }
@@ -87,9 +81,9 @@ void robotForward(int inches){
     while(gmpc(leftWheel) < (inches * TICKS_CONSTSANT)) {
         motor(leftWheel, 75);
         if(gmpc(rightWheel) < gmpc(leftWheel)) {
-            motor(rightWheel, 100);
+            motor(rightWheel, 90);
         } else {
-            motor(rightWheel, 50);
+            motor(rightWheel, 60);
         }
     }
     motor(leftWheel, 0);
@@ -170,13 +164,40 @@ void backOffTape() {
     }
 }
 
-void turnRight() {
-    robotForward2(100, -100);
+void turnLeft(int inches) {
+    cmpc(leftWheel);
+    cmpc(rightWheel);
+    
+    	while((gmpc(leftWheel)*-1) < (inches * 14.1)) {
+        motor(leftWheel, -75);
+        if(gmpc(rightWheel) < gmpc((leftWheel)*-1)) {
+            motor(rightWheel, 100);
+        } else {
+            motor(rightWheel, 50);
+        }
+
+}
+}
+void turnRight(int inches) {
+        cmpc(leftWheel);
+    cmpc(rightWheel);
+    	while((gmpc(rightWheel)*-1) < (inches * 13.3)) {
+        motor(rightWheel, -75);
+        if(gmpc(leftWheel) < gmpc((rightWheel)*-1)) {
+            motor(leftWheel, 100);
+        } else {
+            motor(leftWheel, 50);
+        }
+
+}
 }
 
-void turnLeft() {
-	robotForward2(-100, 100);
+void suckTillHit() {
+    while(digital(noodleBump)==0) {
+        motor(suckerWheels, -250);
+    }
 }
+    
 
 void dispenseNoodlesTesting() {    
     motor(suckerWheels, -70);
@@ -195,50 +216,91 @@ void dispenseNoodlesTesting() {
 void getNoodleFromStand(){
 	enable_servo(arm);
     enable_servo(claw);
-    set_servo_position(arm, 315);
-    set_servo_position(claw, 1900);
+    set_servo_position(arm, 450);
+    set_servo_position(claw, 2047);
     msleep(200);   
     forwardTillTape();
     off(leftWheel);
     off(rightWheel);
-    msleep(2000);
+    msleep(1000);
     backOffTape();
     off(leftWheel);
     off(rightWheel); 
-    msleep(1000);
-    robotForward(500);
+    
+    msleep(700);
+    robotForward(1100);
     off(leftWheel);
     off(rightWheel);    
-    motor(magSpin, 15);
-    msleep(2000);
-    off(magSpin);  
-    set_servo_position(claw, 600);
-    msleep(500);    
-    set_servo_position(arm, 1500);
-    msleep(3000);
-    set_servo_position(claw, 1900);
-    msleep(500);
-    disable_servo(claw);
-    msleep(1000); 
-    jiggle();
+    //motor(magSpin, 15);
+    //msleep(2000);
+    //off(magSpin);  
+    
+    grabNoodle();
+    
+    enable_servo(arm);
+    enable_servo(claw);
+    set_servo_position(arm, 450);
+    set_servo_position(claw, 2047);   
+    
+    robotForward(2100);
+    
+    msleep(1000);
+    grabNoodle();
+    
     motor(suckerWheels, -250);
     msleep(1000);
     motor(suckerWheels, 250);
     msleep(5000);
 }
 
-void getNoodle() {
+void startMoving() {
+    forwardTillTape();
+    backOffTape();
+    robotForward(10000);
+    msleep(3500);
+	turnLeft(97);
+	robotForward2(-120, -83);
+	msleep(4700);
+   	robotForward2(300, 0);
+	msleep(800);
+    robotForward2(100, 300);
+    msleep(600);
+	off(leftWheel);
+	off(rightWheel);
+	getNoodleFromTower();
+	getNoodleFromTower();
+	getNoodleFromTower();
+	robotForward2(75, 72);
+	robotForward(4000);
+	turnLeft(90);
+	 
+	
+	
+    
+}
+void grabNoodle() {
+   set_servo_position(claw, 500);
+    msleep(500);    
+    set_servo_position(arm, 1600);
+    msleep(1000);
+    set_servo_position(claw, 2000);
+    msleep(500);
+    disable_servo(claw);
+    msleep(1000); 
+    jiggle(); 
+}
+
+void getNoodleFromTower() {
     forwardTillTapeAgainstWall();
     msleep(1000);
     backOffTapeAgainstWall();
     msleep(200);
     motor(leftWheel, 75);
     motor(rightWheel, 72);
-    msleep(500);    
+    msleep(400);    
     motor(leftWheel, 0);
     motor(rightWheel, 0);
-    motor(suckerWheels, -250);
-    msleep(3000);
+    suckTillHit();
     motor(suckerWheels, 0);    
     motor(magSpin, -60);
     msleep(300);
