@@ -225,7 +225,7 @@ void ineffectiveNoodleDispensing() {
     motor(leftWheel, 0);
     motor(rightWheel, 0);
     msleep(1000);
-    motor(suckerWheels, -70)
+    motor(suckerWheels, -70);
    
     
   
