@@ -1,22 +1,20 @@
 #include <kipr/botball.h>
 
 // DRIVING CONSTANTS
-const int TAPE_THRESHOLD = 1800;
-const int TAPE_SPEED = 250; // mm per second, should be low
+const int TAPE_SPEED = 200; // mm per second, should be low
 const double ROTATION_CONSTANT = 27.0 / 90.0;
+// Tape Thresholds
+const int GREY_TAPE_THRESHOLD = 2600;
+const int BLACK_TAPE_THRESHOLD = 1000;
 
 int main()
 {
     enable_servos();
     create_connect();
 
-    int i = 0;
-    while (i == 0)
-    {
-        printf("%i", get_create_lfcliff_amt());
-        printf(",");
-        msleep(250);
-    }
+    // initServos();
+    // getBotGirl();
+    forwardTillTape(GREY_TAPE_THRESHOLD, BLACK_TAPE_THRESHOLD);
 
     create_disconnect();
     disable_servos();
@@ -39,7 +37,7 @@ void robotMove(int i)
     }
     else
     {
-        while (get_create_distance() < (i))
+        while (-1 * get_create_distance() > (i))
         {
             create_drive_direct(-200, -200);
         }
@@ -47,41 +45,29 @@ void robotMove(int i)
     create_stop();
 }
 
-void forwardTillTape()
+void forwardTillTape(LEFT_THRESHOLD, RIGHT_THREADHOLD)
 {
 
-    while ((get_create_lfcliff_amt() < TAPE_THRESHOLD) || (get_create_rfcliff_amt() < TAPE_THRESHOLD))
+    while ((get_create_lcliff_amt() > LEFT_THRESHOLD) &&
+           (get_create_rcliff_amt() > RIGHT_THREADHOLD))
     {
-        if ((get_create_lfcliff_amt() < TAPE_THRESHOLD) && (get_create_rfcliff_amt() >= TAPE_THRESHOLD))
-        {
-            create_drive_direct(0.75 * TAPE_SPEED, -0.1 * TAPE_SPEED);
-        }
-        else if ((get_create_lfcliff_amt() >= TAPE_THRESHOLD) && (get_create_rfcliff_amt() < TAPE_THRESHOLD))
-        {
-            create_drive_direct(-0.1 * TAPE_SPEED, 0.75 * TAPE_SPEED);
-        }
-        else
-        {
-            create_drive_direct(TAPE_SPEED, TAPE_SPEED);
-        }
+        create_drive_direct(TAPE_SPEED, TAPE_SPEED);
     }
     create_stop();
+    create_disconnect();
 }
 
-void FromNthTowerToMthTower(int n, int m)
+void MoveNTowers(int n)
 {
     // assumes the robot is not already on a tape
     // m > n
 
-    int i = n;
-    while (i <= m)
+    int i = 0;
+    while (i <= n)
     {
-        printf("%i", get_create_lfcliff_amt());
-        printf(",");
-        printf("%i", TAPE_THRESHOLD);
-        while ((get_create_lfcliff_amt() < TAPE_THRESHOLD))
+        while ((get_create_lcliff_amt() < GREY_TAPE_THRESHOLD))
         {
-            printf("%i", get_create_lfcliff_amt());
+            printf("%i", get_create_lcliff_amt());
             create_drive_direct(TAPE_SPEED, TAPE_SPEED);
         }
 
@@ -92,7 +78,7 @@ void FromNthTowerToMthTower(int n, int m)
 
 void forwardTillBump()
 {
-    while (get_create_rbump() == 0)
+    while (get_create_rbump() == 0 && get_create_lbump() == 0)
     {
         create_drive_direct(200, 200);
     }
@@ -125,16 +111,56 @@ void turnAround()
     robotTurn(90);
 }
 
-/*--------------------------------------------------------Claws--------------------------------------------------------*/
+/*--------------------------------------------------------Claw--------------------------------------------------------*/
 
 // SERVO PINS
 const int CLAW = 0;         // powering the claw to open and close
 const int CLAW_PARLLEL = 1; // the vertical rotation of the servo for the sake of making the claw move parallel-ly
 // MOTOR PINS
-const int ORANGE_MOTOR = 0; // this is the motor on the LEFT
-const int BLACK_MOTOR = 1;  // this is the motor on the RIGHT
-// MOTOR RATIOS
+const int CLAW_MOTOR = 1; // used to move the claw up and down using rotation
 const int MOTOR_ROATION_CONSTANT = 1;
+
+void initServos()
+{
+    set_servo_position(CLAW, 600);
+    msleep(1000);
+
+    set_servo_position(CLAW_PARLLEL, 0);
+    msleep(1000);
+}
+
+void moveClawY(int ticks)
+{
+
+    cmpc(CLAW_MOTOR);
+
+    if (ticks < 0)
+    {
+        while (gmpc(CLAW_MOTOR) > ticks)
+        {
+            motor(CLAW_MOTOR, -20);
+        }
+    }
+    else
+    {
+        while (gmpc(CLAW_MOTOR) < ticks)
+        {
+            motor(CLAW_MOTOR, 20);
+        }
+    }
+
+    off(CLAW_MOTOR);
+}
+void moveClawParallel(int position)
+{
+    set_servo_position(CLAW_PARLLEL, position);
+}
+void moveClaw(int position)
+{
+    set_servo_position(CLAW, position);
+}
+
+/*--------------------------------------------------------Rings--------------------------------------------------------*/
 
 /* ringIndex :
 0 - RED
@@ -144,68 +170,108 @@ const int MOTOR_ROATION_CONSTANT = 1;
 4 - BLUE
 */
 
-void initServos()
+void initRings()
 {
-    clawOpen();
+    set_servo_position(CLAW, 600);
     msleep(1000);
 
-    clawParallel(0);
+    set_servo_position(CLAW_PARLLEL, 0);
     msleep(1000);
+
+    moveClawY(100);
 }
 
 const int closeClawPositionList[5] = {245, 245, 320, 650, 690};
 void closeClaw(int ringIndex)
 {
-    set_servo_position(CLAW, closeClawPositionList[ringIndex]);
+    moveClaw(closeClawPositionList[ringIndex]);
+    msleep(1000);
 }
 void clawOpen()
 {
     set_servo_position(CLAW, 1000);
+    msleep(1000);
 }
 
-const int clawParallelPositionList[5] = {0, 0, 0, 0, 0};
-void clawParallel(int ringIndex)
+const int clawParallelPositionList[5] = {2047, 0, 0, 0, 0};
+void ringParallel(int ringIndex)
 {
-    set_servo_position(CLAW_PARLLEL, clawParallelPositionList[ringIndex]);
+    moveClawParallel(clawParallelPositionList[ringIndex]);
+    msleep(1000);
 }
 
-const int motorBottomTickList[5] = {750, 0, 0, 0, 0}; // in ticks (aka. position) this is for picking up the rings
-void motorMoveRingBottom(int ringIndex)
+const int motorTickListDown[5] = {750, 0, 0, 0, 0}; // in ticks (aka. position) this is for picking up the rings
+void ringYDown(int ringIndex)
 {
-    cmpc(ORANGE_MOTOR);
-    cmpc(BLACK_MOTOR);
+    off(CLAW_MOTOR);
+    msleep(2000);
 
-    while (gmpc(ORANGE_MOTOR) < (motorBottomTickList[ringIndex]))
-    {
-        motor(ORANGE_MOTOR, 75);
-        if (gmpc(BLACK_MOTOR) < gmpc(ORANGE_MOTOR))
-        {
-            motor(BLACK_MOTOR, 100);
-        }
-        else
-        {
-            motor(BLACK_MOTOR, 50);
-        }
-    }
+    moveClawY(motorTickListDown[ringIndex]);
 }
 
-void doRingBottom(int ringIndex) // pick up the rings FROM the (bottom)
+void ringDown(int ringIndex) // pick up the rings FROM the (bottom)
 {
+    ringYDown(ringIndex);
+    ringParallel(ringIndex);
+    closeClaw(ringIndex);
 }
 
 /*--------------------------------------------------------Complex Movement--------------------------------------------------------*/
 
-void boxUnderPomPom()
+void initBotGirl()
 {
-    robotTurn(90);
-    robotMove(20);
+    // robotMove(-2);
+    // create_drive_direct(0, -200);
+    // msleep(300);
+    // create_stop();
 
-    robotTurn(-90);
-    forwardTillBump();
+    moveClawParallel(1500);
+    msleep(500);
+    moveClaw(1100);
+    msleep(500);
+}
+
+void botGirlClaw()
+{
+    initBotGirl();
+
+    moveClawY(-850);
+    msleep(500);
+
+    moveClawParallel(1250);
+    msleep(500);
+
+    moveClaw(0);
+    moveClawParallel(1500);
+    msleep(500);
+
+    moveClaw(0);
+    moveClawParallel(1600);
+    msleep(500);
+
+    moveClawY(800);
 }
 
 void getBotGirl()
 {
-    FromNthTowerToMthTower(1, 3);
+    robotMove(5);
+    robotTurn(-45);
+    robotMove(40);
+    initRings();
+
+    forwardTillBump();
+    robotMove(-1);
+
+    robotTurn(45);
+
+    forwardTillTape(GREY_TAPE_THRESHOLD, BLACK_TAPE_THRESHOLD);
+    robotMove(3);
+
+    moveClawY(500);
+    off(CLAW_MOTOR);
+
+    msleep(1000);
+
+    botGirlClaw();
 }
-//continued
+// continued
