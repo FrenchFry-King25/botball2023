@@ -35,7 +35,40 @@ int main() {
     
     // 72, 75 straight
     
-   	//startMoving();
+    //robotForward2(72, 75);
+    //msleep(1000);
+    //robotForward2(0, 0);
+    //msleep(200);
+    //robotForward2(70, 75);
+    //msleep(300);
+    
+    
+    //robotForward2(70, 75);
+    //msleep(2200);
+    //turnRight(90);
+    
+    start_everything();
+    
+    
+    forwardTillBump();  
+    
+    robotForward2(-70, -75);
+    msleep(450);
+    robotForward2(150, 0);
+    msleep(1000);  
+    robotForward2(-70, -75);
+    msleep(400);
+    robotForward2(150, 0);
+    msleep(1000); 
+    
+    getNoodlesFromTower();
+    
+    
+    
+    
+    
+    
+    //startMoving();
    
     //robotForward(000);
     
@@ -48,14 +81,13 @@ int main() {
     //set_servo_position(arm, 450);
     //set_servo_position(claw, 2047);
     //disable_servos();
-
     
     disable_servo(claw);
     
     
     //robotForward2(69, 75);
     //msleep(3000);
-    getNoodlesFromTower();
+    //getNoodlesFromTower();
     //suckTillHit();
     
     //jiggle();
@@ -84,6 +116,10 @@ void start_everything() {
     msleep(400);   
     off(magSpin);
     msleep(1000);
+    motor(magSpin, 60);
+    msleep(20); 
+    off(magSpin);
+    msleep(500);
 }
 
 void jiggle() {
@@ -110,6 +146,21 @@ void jiggle() {
     motor(magSpin, 50);
     msleep(10);
     motor(magSpin, 0);
+}
+
+void jiggle2() {
+    motor(magSpin, 100);
+    msleep(100);
+    motor(magSpin, -100);
+    msleep(100);  
+    motor(magSpin, 100);
+    msleep(100);
+    motor(magSpin, -100);
+    msleep(100);  
+    motor(magSpin, -100);
+    msleep(10);
+    motor(magSpin, 0); 
+    msleep(200);
 }
 
 void spinServo(int port, int pos) {
@@ -167,7 +218,7 @@ void forwardTillBumpAgainstWall() {
 
 void forwardTillTapeAgainstWall() {
     while(analog(leftIR) < GRAY_THRESHOLD) {
-        motor(leftWheel, 69);
+        motor(leftWheel, 72);
         motor(rightWheel, 75);
     }
     msleep(200);
@@ -224,7 +275,7 @@ void backOnTape() {
             robotForward2(0, -0.05*MOTOR_SPEED);
         }
         else{
-            robotForward2(-10, -10);
+            robotForward2(-25, -25);
         }
     }
 }
@@ -238,7 +289,7 @@ void forwardOffTape() {
             robotForward2(0, 0.05*MOTOR_SPEED);
         }
         else{
-            robotForward2(5, 5);
+            robotForward2(25, 25);
         }
     }
 }
@@ -320,14 +371,14 @@ void getNoodleFromStand(){
     forwardTillTape();
     off(leftWheel);
     off(rightWheel);
-    msleep(1000);
+    msleep(500);
     backOffTape();
     off(leftWheel);
     off(rightWheel); 
     
-    msleep(700);
+    msleep(200);
     robotForward2(70, 75);
-    msleep(600);
+    msleep(700);
     robotForward2(0, 0);
     //motor(magSpin, 15);
     //msleep(2000);
@@ -336,7 +387,7 @@ void getNoodleFromStand(){
     grabNoodle();
     
     motor(suckerWheels, 100);
-    msleep(1100);
+    msleep(800);
     suckTillHit();
     off(suckerWheels);
     
@@ -351,13 +402,13 @@ void getNoodleFromStand(){
     set_servo_position(claw, 2047);   
     
     robotForward2(70, 75);
-    msleep(950);   
+    msleep(1050);   
     robotForward2(0, 0);
     
     msleep(1000);
     grabNoodle();
-    jiggle();
-    jiggle();
+    //jiggle();
+    //jiggle();
     
     motor(suckerWheels, 100);
     msleep(750);
@@ -387,46 +438,65 @@ void getNoodleFromStand(){
     grabNoodle();
     jiggle();
     jiggle();
+    msleep(500);
+    motor(magSpin, 60);
+    msleep(20); 
+    off(magSpin);
     
     
     //enindg
-    motor(suckerWheels, -250);
-    msleep(1000);
-    motor(suckerWheels, 250);
-    msleep(3000);
-    motor(suckerWheels, 0);
+    //motor(suckerWheels, -250);
+    //msleep(1000);
+    //motor(suckerWheels, 250);
+    //msleep(3000);
+    //motor(suckerWheels, 0);
     
-    jiggle();
-    jiggle();
-    motor(suckerWheels, 250);
-    msleep(4000);
-    //motor(suckerWheels, -50);
-    //msleep(50);
-    jiggle();
-    jiggle();
-    //suckTillHit();
-    motor(suckerWheels, 250);
-    msleep(5000);
-    motor(suckerWheels, 0);
+    //jiggle();
+    //jiggle();
+    
+    //
+    //motor(suckerWheels, 250);
+    //msleep(4000);
+    ////motor(suckerWheels, -50);
+    ////msleep(50);
+    //jiggle();
+    //jiggle();
+    ////suckTillHit();
+    //motor(suckerWheels, 250);
+    //msleep(1500);
+    //motor(suckerWheels, 0);
     
 }
 
 void startMoving() {
+    robotForward2(70, 75);
+    msleep(800);    
+    turnLeft(90);
     robotForward2(-70, -75);
-    msleep(2200);
-    backOnTape();
+    msleep(2400);     
+    robotForward2(0, 0);
+    start_everything();
+    getNoodleFromStand(); 
+    
+    robotForward2(-70, -75);
+    msleep(300);
+    turnRight(90);
+    forwardTillTape();   
+    
     forwardOffTape();
     robotForward2(70, 75);
-    msleep(500);
-    turnRight(87);
+    msleep(1800);
+    turnLeft(93);
     msleep(500);  
-    robotForward2(-74, -75);
-    msleep(6100);    
+    robotForward2(-74, -76);
+    msleep(6100);  
+    
+    //after switch
     robotForward2(70, 75);
     msleep(2000);
     turnRight(90);
     forwardTillBump();
-    turnLeft(80); 
+    turnLeft(80);  
     
     robotForward2(72, 75);
     msleep(1000);
@@ -490,11 +560,16 @@ void moveTowersToSwitch () {
 }
 
 void getNoodlesFromTower() {
-    getNoodleFromTower(800);
+    
+    motor(magSpin, -100);
+    msleep(30); 
+    motor(magSpin, 0);
+
+    getNoodleFromTower(800, 10);
     
     //turnLeft(2);
     
-    motor(leftWheel, 74);
+    motor(leftWheel, 72);
     motor(rightWheel, 75);
     msleep(2000);
     motor(leftWheel, 0);
@@ -504,7 +579,7 @@ void getNoodlesFromTower() {
     msleep(800);
     motor(magSpin, 0);
     jiggle();
-    getNoodleFromTower(725);
+    getNoodleFromTower(1025, 5);
     
     
     
@@ -518,21 +593,19 @@ void getNoodlesFromTower() {
     msleep(800);
     motor(magSpin, 0);
     jiggle();
-    getNoodleFromTower(625);
+    getNoodleFromTower(925, 5);
     
 }
 
-void getNoodleFromTower(int forwardInt) {
+void getNoodleFromTower(int forwardInt, int spin) {
     forwardTillTapeAgainstWall();
     msleep(1000);
     printf("HERE");
     backOffTapeAgainstWall();
     msleep(1000);
-    motor(leftWheel, 69);
+    motor(leftWheel, 72);
     motor(rightWheel, 75);
     msleep(forwardInt); //default is 400;    
-    motor(leftWheel, 10);
-    motor(rightWheel, 10);
     //jiggle();
     //motor(suckerWheels, -250);
     //msleep(700);    
@@ -542,12 +615,12 @@ void getNoodleFromTower(int forwardInt) {
     //msleep(700);    
     //motor(suckerWheels, 0);
     //jiggle();
-    turnRight(2);
     motor(suckerWheels, -250);
+    turnRight(spin);
     msleep(700);    
     motor(suckerWheels, 0);
     turnLeft(2);
-    jiggle();
+    jiggle2();
     suckTillHit2();
     motor(suckerWheels, 0);    
     motor(magSpin, -60);
@@ -560,5 +633,5 @@ void getNoodleFromTower(int forwardInt) {
     //motor(magSpin, 60);
     //msleep(800);
     //motor(magSpin, 0);
-    turnLeft(2);
+    turnLeft(spin);
 }
