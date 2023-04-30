@@ -1,20 +1,24 @@
 #include <kipr/botball.h>
 //2.75" from top edge of first tape
 //MOTORS
-const int leftWheel = 0;
+const int leftWheel = 3;
 const int rightWheel = 1;
-const int suckerWheels = 3;
+const int suckerWheels = 0;
 const int magSpin = 2;
 
 //SERVOS
 const int claw = 2; // 2047 open ; 500 closed
 const int arm = 1; // 315 down; 1280 up
+const int magPin = 3; 
+const int magOut = 50;
+const int magIn = 10;
 
 const float TICKS_CONSTSANT = .5;
 
 //infared? sensors
 const int leftIR = 1;
 const int rightIR = 0;
+const int lightPort = 2;
 
 // digital buttons 
 const int noodleBump = 2;
@@ -26,22 +30,22 @@ const int GRAY_THRESHOLD = 2700;
 
 const int MOTOR_SPEED = 250;
 
-const int leftStraight = 75;
-const int rightStraight = 68; 
+const int leftStraight = 60;
+const int rightStraight = 60; 
 
 const float K = 1.0;
 
 int main() {
     //enable_servos();
     //start_everything();
-    
-    disable_servo(claw);
+    wait_for_light(2); // change the port number to match the port you use
+    shut_down_in(119);
     
     
     // leftStraight, rightStraight straight
     
-    //robotForward2(leftStraight, rightStraight);
-    //msleep(6000);
+    //robotForward2(-62, -60);
+    //msleep(6000000);
     //robotForward2(0, 0);
     //msleep(200);
     //robotForward2(70, 75);
@@ -50,13 +54,27 @@ int main() {
     
     //robotForward2(70, 75);
     //msleep(2200);
-    //turnRight(90);
-    
-    startMoving();
+    //turnRight(90);    
     
     
+    enable_servos();
+    set_servo_position(claw, 1900);
+    set_servo_position(arm, 1300);
+    msleep(500);
+    set_servo_position(3, 1120);
+    msleep(500);
+    disable_servos();  
     
-    forwardTillBump();  
+    
+    //pushOutStackedNoodles();
+    
+    //turnLeft(90);
+    //msleep(30000);
+    
+    startMoving();   
+    
+    
+    forwardTillBump(); 
     
     robotForward2(-70, -75);
     msleep(450);
@@ -112,23 +130,27 @@ int main() {
 void start_everything() {
     enable_servo(arm);
     enable_servo(claw);
+    enable_servo(magPin);
     set_servo_position(arm, 450);
     msleep(500);
     set_servo_position(claw, 600); 
     msleep(500);
+    set_servo_position(magPin, magOut); 
+    msleep(500);
     disable_servo(arm);
     disable_servo(claw);
-    motor(magSpin, 60);
-    msleep(500);   
-    motor(magSpin, 0);
-    msleep(500);
-    motor(magSpin, 60);
-    msleep(30); 
-    motor(magSpin, 0);
-    msleep(500);
+    disable_servo(magPin);
+    // motor(magSpin, 60);
+    // msleep(500);   
+    // motor(magSpin, 0);
+    // msleep(500);
+    // motor(magSpin, 60);
+    // msleep(30); 
+    // motor(magSpin, 0);
+    // msleep(500);
 }
 
-void jiggle() {
+void jiggleOLD() {
     motor(magSpin, -100);
     msleep(100);
     motor(magSpin, 100);
@@ -156,6 +178,19 @@ void jiggle() {
     motor(magSpin, 60);
     msleep(30); 
     motor(magSpin, 0);
+}
+
+void jiggle() {
+    enable_servo(magPin);  
+    set_servo_position(magPin, magOut + 100); 
+    msleep(100);
+    set_servo_position(magPin, magOut); 
+    msleep(100);
+    set_servo_position(magPin, magOut + 100); 
+    msleep(100);
+    set_servo_position(magPin, magOut); 
+    msleep(100);
+    disable_servo(magPin);
 }
 
 void jiggle2() {
@@ -304,11 +339,11 @@ void forwardOffTape() {
     }
 }
 
-void turnRight(int inches) {
+void turnLeft(int inches) {
     cmpc(leftWheel);
     cmpc(rightWheel);
     
-    	while((gmpc(leftWheel)*-1) < (inches * 16.25)) {
+    	while((gmpc(leftWheel)*-1) < (inches * 17)) {
         motor(leftWheel, -75);
         if(gmpc(rightWheel) < gmpc((leftWheel)*-1)) {
             motor(rightWheel, 100);
@@ -320,7 +355,7 @@ void turnRight(int inches) {
 
 }
 }
-void turnLeft(int inches) {
+void turnRight(int inches) {
         cmpc(leftWheel);
     cmpc(rightWheel);
     	while((gmpc(rightWheel)*-1) < (inches * 21.5)) {
@@ -388,7 +423,7 @@ void getNoodleFromStand(){
     
     msleep(200);
     robotForward2(70, 75);
-    msleep(700);
+    msleep(630);
     robotForward2(0, 0);
     //motor(magSpin, 15);
     //msleep(2000);
@@ -441,7 +476,7 @@ void getNoodleFromStand(){
     set_servo_position(claw, 2047);   
     
     robotForward2(leftStraight, rightStraight);
-    msleep(2650); //fix this  
+    msleep(3150); //fix this  
     robotForward2(0, 0);
     
     msleep(1000);
@@ -483,22 +518,41 @@ void pushOutStackedNoodles() {
 
 void startMoving() {
     robotForward2(leftStraight, rightStraight);
-    msleep(900 * K);    
+    msleep(900);    
+    robotForward2(0, 0);
     turnLeft(90);
-    robotForward2(-70, -75);
-    msleep(2400);     
+    robotForward2(-62, -60);
+    msleep(3500);     
     robotForward2(0, 0);
     start_everything();
     getNoodleFromStand(); 
     
       
-    robotForward2(-74, -76);
+    robotForward2(-62, -60);
     msleep(5900);  
     
     turnRight(90);
-    forwardTillTape();   
+    robotForward2(60, 60);
+    msleep(2000);  
+    robotForward2(0, 0);
     
-    forwardOffTape();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    pushOutStackedNoodles();
+    
+    msleep(1000000);
+    //this code was moved up - avoid repeating it
+    //it's meant to push te wr
     robotForward2(70, 75);
     msleep(1800);
     turnLeft(93);
